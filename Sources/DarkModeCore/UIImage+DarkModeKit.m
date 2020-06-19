@@ -3,12 +3,27 @@
 //  Licensed under the MIT License.
 //
 
-#import "UIImage+DarkModeKit.h"
 #import "DMDynamicImage.h"
+#import "UIImage+DarkModeKit.h"
+#import "UIImage+DarkModeKitSwizzling.h"
 
 @import ObjectiveC;
 
 @implementation UIImage (DarkModeKit)
+
++ (UIImage *)dm_imageWithLightImage:(UIImage *)lightImage darkImage:(UIImage *)darkImage {
+  return (UIImage *)[[DMDynamicImageProxy alloc] initWithLightImage:lightImage darkImage:darkImage];
+}
+
++ (UIImage *)dm_namespace:(DMNamespace)namespace
+      imageWithLightImage:(UIImage *)lightImage
+                darkImage:(UIImage *)darkImage {
+  return [UIImage dm_imageWithLightImage:lightImage darkImage:darkImage];
+}
+
+@end
+
+@implementation UIImage (DarkModeKitSwizzling)
 
 + (void)dm_swizzleIsEqual {
   static dispatch_once_t onceToken;
@@ -33,16 +48,6 @@
       return ((BOOL(*)(UIImage *, SEL, UIImage *))imp)(realSelf, selector, realOther);
     }), method_getTypeEncoding(method));
   });
-}
-
-+ (UIImage *)dm_imageWithLightImage:(UIImage *)lightImage darkImage:(UIImage *)darkImage {
-  return (UIImage *)[[DMDynamicImageProxy alloc] initWithLightImage:lightImage darkImage:darkImage];
-}
-
-+ (UIImage *)dm_namespace:(DMNamespace)namespace
-      imageWithLightImage:(UIImage *)lightImage
-                darkImage:(UIImage *)darkImage {
-  return [UIImage dm_imageWithLightImage:lightImage darkImage:darkImage];
 }
 
 @end
